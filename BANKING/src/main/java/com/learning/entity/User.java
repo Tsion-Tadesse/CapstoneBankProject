@@ -8,7 +8,7 @@ import javax.persistence.*;
 public class User {
 /*
  * id: Number,
- * username:String,
+ * username:String, UNIQUE 
  * fullname:String,
  * phone: String,
  * SSN: int,
@@ -20,8 +20,12 @@ public class User {
 	private long id;
 	@Column(name="username")
 	private String username;
-	@Column(name="full_name")
-	private String fullName;
+	@Column(name="first_name")
+	private String firstName;
+	@Column(name="last_name")
+	private String lastName;
+	
+	transient private String fullName = firstName + " " + lastName;
 	@Column(name="phone")
 	private String phone;
 	@Column(name="ssn")
