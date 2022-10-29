@@ -1,0 +1,5 @@
+package com.learning.repo;
+
+public interface UserRepsitory extends JpaRepository<User, Long>{
+
+}
