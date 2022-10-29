@@ -95,6 +95,13 @@ public class Account {
 	public void setCustomerId(long customerId) {
 		this.customerId = customerId;
 	}
+
+	@Override
+	public String toString() {
+		return "Account [accountType=" + accountType + ", accountStatus=" + accountStatus + ", accountBalance="
+				+ accountBalance + ", approved=" + approved + ", accountNumber=" + accountNumber + ", dateOfCreation="
+				+ dateOfCreation + ", customerId=" + customerId + "]";
+	}
 	
 	
 }

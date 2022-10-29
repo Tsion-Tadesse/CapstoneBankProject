@@ -1,0 +1,16 @@
+package com.learning.controller;
+
+import org.springframework.web.bind.annotation.RestController;
+
+@ReuestMapping("/api/customer")
+@RestController
+public class UserController {
+
+	//@Autowired
+	//UserRepository userRepository;
+	
+	@Autowired
+	User user;
+@PostMapping("/register")
+User register(@RequestBody User user)
+}
