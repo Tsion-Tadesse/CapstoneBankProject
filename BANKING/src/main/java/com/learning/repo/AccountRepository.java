@@ -1,7 +1,7 @@
 package com.learning.repo;
 
 import java.util.List;
-
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 //import org.springframework.data.jpa.repository.Modifying;
@@ -31,6 +31,8 @@ public interface AccountRepository extends JpaRepository<Account, Long> {
 
 		@Query(value = "Delete from Account e   where  e. accountNumber = :accountNumber")
 		public  void deleteByAccNum(@Param("accountNumber ")long accountNumber);
+
+		
 
 		
 

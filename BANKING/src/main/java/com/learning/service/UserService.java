@@ -23,6 +23,10 @@ public class UserService implements IUserService{
 	private UserRepsitory userRepo;
 	
 	
+	
+	
+	
+	
 	public List<User> findAllUsers() {
 		return userRepo.findAll();
 	}
@@ -76,5 +80,9 @@ public class UserService implements IUserService{
 	
 	
 	}
+	
+	
+	
+	
 	
 }

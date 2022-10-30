@@ -3,7 +3,12 @@ package com.learning.controller;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PostAuthorize;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -11,95 +16,81 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.learning.entity.Account;
 import com.learning.entity.User;
-import com.learning.repo.UserRepsitory;
 import com.learning.service.UserService;
 
 @RestController
-@RequestMapping("/api/user")
+@RequestMapping("/api")
+@EnableGlobalMethodSecurity(prePostEnabled=true)
 public class UserController {
 	
 	
+	
+	
+	@Autowired
+	UserService userService;
+	
+	@PreAuthorize("hasRole('ROLE_STAFF') or hasRole('ROLE_ADMIN')")
+	@GetMapping("/users")
+	public List<User> getAllUsers(Authentication authentication) {
+		
+		return userService.findAllUsers();
+		
+	}
+		
+	@PostMapping("/user")
+	public ResponseEntity<User> saveusers(@RequestBody User newUser,Authentication auth) {
+		System.out.println(newUser.getFullName()+"  "+auth.getName());
+		return ResponseEntity.status(HttpStatus.CREATED).body((userService.saveUser(newUser)));
+		
+	}
+	
+	@PreAuthorize("@userSecurity.hasUserId(authentication,#id)")
+	@GetMapping("/user/{id}")
+	public ResponseEntity<User> getUserById(@PathVariable("id") long id, Authentication authentication) {
+		System.out.println("Inside getuserbyid method");
+		return ResponseEntity.ok().body(userService.findUserById(id).get());
+		
+	}
+	
+	@PutMapping("/user/{id}")
+	
 
+	
+	
+	
+	
+	public ResponseEntity<User> updateUser(@PathVariable("userId") long id,@RequestBody User newUser) {
+		return ResponseEntity.ok().body(userService.updateUser(id,newUser));
+		
+	}
+	
+	
+	@DeleteMapping("/user/{id}")
+	public ResponseEntity<User> deleteUser(@PathVariable("id") long id) {
+		 userService.deleteUser(id);
+		 return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+		
+	}
+	
+	@GetMapping("/user/search")
+	@PostAuthorize("returnObject.body.username==authenticated.user")
+	public ResponseEntity<User> userDetails(Authentication authentication, @RequestParam("fullName") String fullName) throws Exception {
+		System.out.println(authentication.getName().toString());
+		User User=userService.findByUserName(fullName);
+		if(User==null) {
+			ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
+		}
+		return ResponseEntity.ok().body(User);
+		
+	}
+	
+	
 	 
-	
-	@Autowired
-	UserRepsitory userrepo;
-	@Autowired
-	UserService userServ;
-
-	@PostMapping("/adduser")
-	User newUser(@RequestBody User user) {  	
-	
-		return userrepo.save(user);
-	}
-
-	
-    @PutMapping("/updatuser/{id}")
-    public ResponseEntity<User> updateUser(@PathVariable("id") long id,@RequestBody User userDetails) {
-       User updateUser = userrepo.findById(id)
-                .orElseThrow(() -> new RuntimeException("User Does not exist with id: " + id));
-
-        updateUser.setFullName(userDetails.getFullName());
-        updateUser.setPassword(userDetails.getPassword());
-
-        userrepo.save(updateUser);
-
-        return ResponseEntity.ok(updateUser);
-    }
-
-	@GetMapping ("/getUser")
-	List<User>all(){
-		return userrepo.findAll();
-	}
-
-	@GetMapping ("/getsortByFullName")
-	List<User>findAllSortedByName(){
-
-		//return userServ.performSorting();
-		return userrepo.findAllSortedByfullName();
-	}
-
-	@GetMapping ("/getsortById")
-	List<User>findAllSortedById(){
-		return userrepo.findALLSortedByUserId();
-	}
-
-
-	@DeleteMapping("/deleteuser/{id}")
-	public String deleteUser(@PathVariable("id") long id) {
-		try {
-			userrepo.deleteById(id);
-			return "  USER DELETED SUCESSFULL!!";
-		}catch(Exception e) {
-			e.printStackTrace();
-			return " UNABLE TO DELETE ID, PLEASE TRY AGAIN";
-		}
-	}
-
-	@DeleteMapping("/deletUser/{fullName}")
-	public String deleteName(@PathVariable("fullNmae") String fullName) {
-		try {
-			userrepo.deleteByUserfullName(fullName);
-			return " DELETE SUCESSFULL!!";
-		}catch(Exception e) {
-			e.printStackTrace();
-			return " UNABLE TO DELETE NAME, PLEASE TRY AGAIN";
-		}
-	}
-	@DeleteMapping("/deletUser/{id}")
-	public String deleteId(@PathVariable("id") long id) {
-		try {
-			userrepo.deleteByUserId(id);
-			return " DELETE SUCESSFULL!!";
-		}catch(Exception e) {
-			e.printStackTrace();
-			return " UNABLE TO DELETE NAME, PLEASE TRY AGAIN";
-		}
-	}
-	
 	
 	
 	

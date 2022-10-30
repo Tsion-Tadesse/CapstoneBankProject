@@ -1,82 +1,96 @@
 package com.learning.controller;
 
+
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PostFilter;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import com.learning.entity.Account;
-import com.learning.repo.AccountRepository;
 import com.learning.service.AccountService;
 
+
+@RestController
+@RequestMapping("/api")
 public class AccountController {
 	
 	
 	
 	
+
+	
 	
 	@Autowired
-	AccountRepository accRepo;
-	@Autowired
-	AccountService accService;
-
+	AccountService accServ;
+	
+	@GetMapping("/account")
+	public ResponseEntity<List<Account>> getAllAccount() {
+		return ResponseEntity.ok().body( accServ.findAllAccounts());
+		
+	}
+	
+	@GetMapping("/account/owned")
+	@PostFilter("filterObject.owner==authentication.name")
+	public List<Account> getAccountOwnedBy() {
+		return  accServ.findAllAccounts();
+		
+	}
+	
 	@PostMapping("/account")
-	Account newAccount(@RequestBody Account account) {  	
+	public ResponseEntity<Account> saveAccount(@RequestBody Account newAccount,Authentication auth) {
+		System.out.println(newAccount.getCustomerId()+"  "+auth.getName());
+		return ResponseEntity.status(HttpStatus.CREATED).body(( accServ.saveAccount(newAccount)));
+		
+	}
 	
-		return accRepo.save(account);
+	@GetMapping("/account/{cutomerId}")
+	public ResponseEntity<Account> getByCustId(@PathVariable("customerId") long customerId) {
+		return ResponseEntity.ok().body(accServ.findByCustId(customerId));
+				
+		
 	}
-
 	
-    @PutMapping("/updateaccount/{id}")
-    public ResponseEntity<Account> updateAccount(@PathVariable("accountNumber") long accountNumber ,@RequestBody Account accountDetails) {
-       Account updateAccount = accRepo.findById(accountNumber)
-                .orElseThrow(() -> new RuntimeException("Account  not exist with accountNumber: " + accountNumber));
-
-        updateAccount.setAccountType(accountDetails.getAccountType());
-        updateAccount.setAccountNumber(accountDetails.getAccountNumber());
-        updateAccount.setCustomerId(accountDetails.getCustomerId());
-
-        accRepo.save(updateAccount);
-
-        return ResponseEntity.ok(updateAccount);
-    }
-
-	@GetMapping ("/getaccount")
+	@PutMapping("/account/{cutomerId}")
+	public ResponseEntity<Account> updateAccount(@PathVariable("customerId") long customerId,@RequestBody Account newAccount) {
+		return ResponseEntity.ok().body( accServ.updateAccount(customerId,newAccount));
+		
+	}
 	
-	List<Account>all(){
-		return  accRepo.findAll();
+	@DeleteMapping("/account/{customerId}")
+	public ResponseEntity<Account> deleteAccount(@PathVariable("id") long customerId) {
+		  accServ.delete(customerId);
+		 return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+		
 	}
-
-	@GetMapping ("/getsortByAccName")
-	List<Account>findAllSortedByCustId(){
-
-		//return accService.performSorting();
-		return accRepo.findALLSortedByCustId();
-	}
-
-	@GetMapping ("/getsortByAccNum")
-	List<Account>findAllSortedByAccNum(){
-		return accRepo.findAllSortedByAccNum();
-	}
-
-
-	@DeleteMapping("/deleteaccount/{id}")
-	public String deleteAccount(@PathVariable("accountNumber") long accountNumber) {
-		try {
-			accRepo.deleteByCustId(accountNumber);
-			return "  ACOOUNT DELETED SUCESSFULL!!";
-		}catch(Exception e) {
-			e.printStackTrace();
-			return " UNABLE TO DELETE ACCOUNT, PLEASE TRY AGAIN";
+	
+	@GetMapping("/account/search")
+	public ResponseEntity<?> userDetails(Authentication auth, @RequestParam("accountNumber") long accountNumber)
+	{
+		System.out.println(auth.getName().toString());
+		Account account= accServ.findByCustId(accountNumber);
+		if(account==null) {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Account not found");
 		}
+		return ResponseEntity.ok().body(account);
+		
 	}
-
+	
+	
+	
+	
+	
+	
 }
 	
 	

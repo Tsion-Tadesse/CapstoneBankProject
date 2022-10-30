@@ -22,9 +22,10 @@ public class  AccountService  implements IAccountService{
 		return accRepo.findAll();
 	}
 
+	
 
 	public Optional<Account> findAccByAccNum(long accountNumber ) {
-		return accRepo.findById(accountNumber);
+		return accRepo. findById(accountNumber);
 	}
 	
 	public Account findByCustId(long customerId) {
@@ -72,6 +73,9 @@ public class  AccountService  implements IAccountService{
 		
 		
 	}
+
+
+	
 	
 	
 	
