@@ -32,13 +32,15 @@ public class Account {
 	private Date dateOfCreation;
 	@Column(name="customer_id")
 	private long customerId;
+	@Column(name="owner")
+	private String owner;
 	
 	public Account() {
 		super();
 	}
 
 	public Account(AccountType accountType, BigDecimal accountBalance, boolean approved, long accountNumber,
-			Date dateOfCreation, long customerId) {
+			Date dateOfCreation, long customerId, String owner) {
 		super();
 		this.accountType = accountType;
 		this.accountBalance = accountBalance;
@@ -46,6 +48,7 @@ public class Account {
 		this.accountNumber = accountNumber;
 		this.dateOfCreation = dateOfCreation;
 		this.customerId = customerId;
+		this.owner =owner;
 	}
 
 	public AccountType getAccountType() {
@@ -95,6 +98,12 @@ public class Account {
 	public void setCustomerId(long customerId) {
 		this.customerId = customerId;
 	}
-	
+	public String getOwner() {
+		return owner;
+	}
+
+	public void setOwner(String owner) {
+		this.owner = owner;
+	}
 	
 }
