@@ -32,6 +32,8 @@ public class User {
 	private int ssn;
 	@Column(name="password")
 	private String password;
+	@Column(name="role")
+	private String role;
 	
 	public User() {
 		super();
@@ -43,6 +45,24 @@ public class User {
 		this.username = username;
 		this.fullName = fullName;
 		this.password = password;
+	}
+
+	public User(long id, String username, String fullName, String password,String role) {
+		super();
+		this.id = id;
+		this.username = username;
+		this.fullName = fullName;
+		this.password = password;
+		this.role = role;
+	}
+	
+	public String getRole() {
+		return role;
+	}
+
+
+	public void setRole(String role) {
+		this.role = role;
 	}
 
 	public long getId() {
